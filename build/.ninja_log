@@ -1,0 +1,8 @@
+# ninja log v6
+28	925	7681519326650186	CMakeFiles/chess_game.dir/src/Zobrist.cpp.obj	a004b78e9c63e962
+4	1339	7681519326405988	CMakeFiles/chess_game.dir/src/AI.cpp.obj	1c5932e09d27a7ff
+33	1469	7681519326707531	CMakeFiles/chess_game.dir/src/main.cpp.obj	1a7ef3929404343c
+21	1535	7681519326590167	CMakeFiles/chess_game.dir/src/Piece.cpp.obj	f150542a96dfa2b7
+16	1639	7681519326524748	CMakeFiles/chess_game.dir/src/Game.cpp.obj	8f6e73e4465f2931
+11	2698	7681519326474599	CMakeFiles/chess_game.dir/src/Board.cpp.obj	1baa56411cc427af
+2699	2929	7681519353347314	chess_game.exe	5d74f7e5311a40bc
