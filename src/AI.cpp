@@ -31,11 +31,82 @@ int AI::getPieceValue(PieceType type)
     }
 }
 
+
 int AI::evaluateBoard(const Board &board)
 {
     int materialScore = 0;
+    int positionalScore = 0;
+    
+    // Piece-square tables (simplified) for positional evaluation
+    static const int pawnTable[64] = {
+        0,  0,  0,  0,  0,  0,  0,  0,
+        50, 50, 50, 50, 50, 50, 50, 50,
+        10, 10, 20, 30, 30, 20, 10, 10,
+        5,  5, 10, 25, 25, 10,  5,  5,
+        0,  0,  0, 20, 20,  0,  0,  0,
+        5, -5,-10,  0,  0,-10, -5,  5,
+        5, 10, 10,-20,-20, 10, 10,  5,
+        0,  0,  0,  0,  0,  0,  0,  0
+    };
+    
+    static const int knightTable[64] = {
+        -50,-40,-30,-30,-30,-30,-40,-50,
+        -40,-20,  0,  0,  0,  0,-20,-40,
+        -30,  0, 10, 15, 15, 10,  0,-30,
+        -30,  5, 15, 20, 20, 15,  5,-30,
+        -30,  0, 15, 20, 20, 15,  0,-30,
+        -30,  5, 10, 15, 15, 10,  5,-30,
+        -40,-20,  0,  5,  5,  0,-20,-40,
+        -50,-40,-30,-30,-30,-30,-40,-50
+    };
+    
+    static const int bishopTable[64] = {
+        -20,-10,-10,-10,-10,-10,-10,-20,
+        -10,  0,  0,  0,  0,  0,  0,-10,
+        -10,  0, 10, 10, 10, 10,  0,-10,
+        -10,  5,  5, 10, 10,  5,  5,-10,
+        -10,  0,  5, 10, 10,  5,  0,-10,
+        -10,  5,  5,  5,  5,  5,  5,-10,
+        -10,  0,  5,  0,  0,  5,  0,-10,
+        -20,-10,-10,-10,-10,-10,-10,-20
+    };
+    
+    static const int rookTable[64] = {
+        0,  0,  0,  0,  0,  0,  0,  0,
+        5, 10, 10, 10, 10, 10, 10,  5,
+        -5,  0,  0,  0,  0,  0,  0, -5,
+        -5,  0,  0,  0,  0,  0,  0, -5,
+        -5,  0,  0,  0,  0,  0,  0, -5,
+        -5,  0,  0,  0,  0,  0,  0, -5,
+        -5,  0,  0,  0,  0,  0,  0, -5,
+        0,  0,  0,  5,  5,  0,  0,  0
+    };
+    
+    static const int queenTable[64] = {
+        -20,-10,-10, -5, -5,-10,-10,-20,
+        -10,  0,  0,  0,  0,  0,  0,-10,
+        -10,  0,  5,  5,  5,  5,  0,-10,
+        -5,  0,  5,  5,  5,  5,  0, -5,
+        0,  0,  5,  5,  5,  5,  0, -5,
+        -10,  5,  5,  5,  5,  5,  0,-10,
+        -10,  0,  5,  0,  0,  0,  0,-10,
+        -20,-10,-10, -5, -5,-10,-10,-20
+    };
+    
+    static const int kingMiddleGameTable[64] = {
+        -30,-40,-40,-50,-50,-40,-40,-30,
+        -30,-40,-40,-50,-50,-40,-40,-30,
+        -30,-40,-40,-50,-50,-40,-40,-30,
+        -30,-40,-40,-50,-50,-40,-40,-30,
+        -20,-30,-30,-40,-40,-30,-30,-20,
+        -10,-20,-20,-20,-20,-20,-20,-10,
+        20, 20,  0,  0,  0,  0, 20, 20,
+        20, 30, 10,  0,  0, 10, 30, 20
+    };
+    
     try
     {
+        // Count material and evaluate position
         for (int r = 0; r < 8; ++r)
         {
             for (int c = 0; c < 8; ++c)
@@ -43,14 +114,45 @@ int AI::evaluateBoard(const Board &board)
                 Piece *piece = board.getPiece(r, c);
                 if (piece)
                 {
+                    // Material score calculation (same as before)
                     int value = getPieceValue(piece->getType());
+                    
+                    // Calculate position index (0-63) with orientation based on piece color
+                    int posIdx = piece->getColor() == Color::White ? (7-r)*8 + c : r*8 + c;
+                    
+                    // Add positional score based on piece type
+                    int posValue = 0;
+                    switch (piece->getType()) {
+                        case PieceType::Pawn:
+                            posValue = pawnTable[posIdx];
+                            break;
+                        case PieceType::Knight:
+                            posValue = knightTable[posIdx];
+                            break;
+                        case PieceType::Bishop:
+                            posValue = bishopTable[posIdx];
+                            break;
+                        case PieceType::Rook:
+                            posValue = rookTable[posIdx];
+                            break;
+                        case PieceType::Queen:
+                            posValue = queenTable[posIdx];
+                            break;
+                        case PieceType::King:
+                            posValue = kingMiddleGameTable[posIdx];
+                            break;
+                    }
+                    
+                    // Apply scores based on which side the piece belongs to
                     if (piece->getColor() == aiColor)
                     {
                         materialScore += value;
+                        positionalScore += posValue;
                     }
                     else
                     {
                         materialScore -= value;
+                        positionalScore -= posValue;
                     }
                 }
             }
@@ -67,6 +169,18 @@ int AI::evaluateBoard(const Board &board)
         return 0;
     }
 
+    // Add mobility evaluation (bonus for having more moves available)
+    int mobilityScore = 0;
+    try {
+        // Count legal moves for each side and add a small bonus per move
+        std::vector<Move> aiMoves = generateLegalMoves(board, aiColor);
+        std::vector<Move> opponentMoves = generateLegalMoves(board, opponentColor);
+        mobilityScore = (aiMoves.size() - opponentMoves.size()) * 5;
+    } catch (...) {
+        // Safely ignore mobility calculation if it fails
+    }
+
+    // Check for checkmate/stalemate as before
     Board boardCopy = board;
     Color playerWhoJustMoved = board.getCurrentTurn();
     Color playerWhoseTurnIsNext = (playerWhoJustMoved == Color::White) ? Color::Black : Color::White;
@@ -84,7 +198,8 @@ int AI::evaluateBoard(const Board &board)
         return 0;
     }
 
-    return materialScore;
+    // Combine all evaluation components
+    return materialScore + positionalScore + mobilityScore;
 }
 
 std::vector<Move> AI::generateLegalMoves(const Board &board, Color color)

@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <vector>
 #include <memory>
-#include <SDL3/SDL.h>
+#include "SDLIncludes.h"
 #include "Piece.h"
 #include <iostream>
 #include <tuple>
@@ -47,6 +47,10 @@ private:
     int m_moveToRow, m_moveToCol;
     Piece* m_capturedPiece;
     static const std::vector<SDL_Point> knightMoves[64];
+    bool m_whiteCanCastleKingside = true;
+    bool m_whiteCanCastleQueenside = true;
+    bool m_blackCanCastleKingside = true;
+    bool m_blackCanCastleQueenside = true;
 public:
     bool isInCheck(Color color) const;
     Board(const Board& other);
@@ -144,4 +148,27 @@ public:
 
     }
     void setSquare(int row, int col, Piece* piece);
+        // Add this to your Board.h
+    std::pair<int, int> getEnPassantTarget() const {
+        if (m_lastMovedPawn == nullptr || m_enPassantCol == -1) {
+            return {-1, -1};
+        }
+        
+        // Return the square behind the pawn that just moved two squares
+        int row = m_lastMovedPawn->getColor() == Color::White ? 2 : 5;
+        return {row, m_enPassantCol};
+    }
+    
+    // Add these methods if they don't exist already
+    bool canCastleKingside(Color color) const {
+        return color == Color::White ? m_whiteCanCastleKingside : m_blackCanCastleKingside;
+    }
+    
+    bool canCastleQueenside(Color color) const {
+        return color == Color::White ? m_whiteCanCastleQueenside : m_blackCanCastleQueenside;
+    }
+    int getWhiteKingRow() const { return m_whiteKingRow; }
+    int getWhiteKingCol() const { return m_whiteKingCol; }
+    int getBlackKingRow() const { return m_blackKingRow; }
+    int getBlackKingCol() const { return m_blackKingCol; }
 };
