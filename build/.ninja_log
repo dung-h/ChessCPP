@@ -1,9 +1,9 @@
 # ninja log v6
-35	596	7695296607734220	CMakeFiles/chess_game.dir/src/Zobrist.cpp.obj	a573d7045e1ed071
-4	888	7695296607410630	CMakeFiles/chess_game.dir/src/AI.cpp.obj	c20fd76850c4343e
-42	2006	7695296607798449	CMakeFiles/chess_game.dir/src/main.cpp.obj	4d00f470dfe20b2f
-29	2039	7695296607666183	CMakeFiles/chess_game.dir/src/StockFish.cpp.obj	87d06be0493e037f
-23	2142	7695296607605353	CMakeFiles/chess_game.dir/src/Piece.cpp.obj	ab4f6b5d6a81c7ac
-16	3012	7695296607535174	CMakeFiles/chess_game.dir/src/Game.cpp.obj	66b98fe15bd2e708
-10	3777	7695296607471463	CMakeFiles/chess_game.dir/src/Board.cpp.obj	c5deb4c6676185da
-3778	3995	7695296645142376	chess_game.exe	3cfbae44a446ab5a
+28	471	7703589691563411	CMakeFiles/chess_game.dir/src/Zobrist.cpp.obj	a573d7045e1ed071
+4	757	7703589691316401	CMakeFiles/chess_game.dir/src/AI.cpp.obj	c20fd76850c4343e
+23	1736	7703589691517597	CMakeFiles/chess_game.dir/src/StockFish.cpp.obj	87d06be0493e037f
+33	1759	7703589691609247	CMakeFiles/chess_game.dir/src/main.cpp.obj	4d00f470dfe20b2f
+18	1821	7703589691458391	CMakeFiles/chess_game.dir/src/Piece.cpp.obj	ab4f6b5d6a81c7ac
+14	2518	7703589691411747	CMakeFiles/chess_game.dir/src/Game.cpp.obj	66b98fe15bd2e708
+9	3123	7703589691377572	CMakeFiles/chess_game.dir/src/Board.cpp.obj	c5deb4c6676185da
+3125	3296	7703589722518334	chess_game.exe	3cfbae44a446ab5a
